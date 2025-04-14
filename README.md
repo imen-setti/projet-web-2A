@@ -1,5 +1,5 @@
 # projet-web-2A
-# 📝 Projet Blog - Site de Réservation d'Événements
+#  Projet Blog - Site de Réservation d'Événements
 
 Ce projet est un module **Blog** intégré dans un site web de réservation d'événements. Il permet d’ajouter, afficher et gérer des articles de blog.
 
