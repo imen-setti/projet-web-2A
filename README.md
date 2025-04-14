@@ -27,7 +27,7 @@ Le projet suit le modèle MVC :
 - **View** : contient le HTML et CSS
 - **Controller** : fait le lien entre les vues et les données
 
-## ⚙️ Installation
+## Installation
 
 1. Clone le projet :
    ```bash
