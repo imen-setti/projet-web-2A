@@ -17,14 +17,13 @@ Ce projet est un module **Blog** intégré dans un site web de réservation d'é
 - HTML
 - CSS
 - PHP
-- MySQL (base de données)
 - XAMPP (ou tout autre serveur local)
 
 ##  Architecture MVC:
 
 Le projet suit le modèle MVC :
 - **Model** : gère la base de données et les requêtes SQL
-- **View** : contient le HTML et CSS
+- **View** : contient le HTML et CSS en integrant template.
 - **Controller** : fait le lien entre les vues et les données
 
 ## Installation
