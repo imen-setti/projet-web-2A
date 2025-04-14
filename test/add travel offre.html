@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRAVEL BOOKING - Ajouter une offre</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e5799;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #1e5799;
+            outline: none;
+            box-shadow: 0 0 5px rgba(30, 87, 153, 0.3);
+        }
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #1e5799;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #207cca;
+        }
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ajouter une nouvelle offre de voyage</h1>
+        
+        <form id="travelOfferForm">
+            <!-- Titre -->
+            <div class="form-group">
+                <label for="title" class="required">Titre de l'offre</label>
+                <input type="text" id="title" name="title" required 
+                       minlength="3" 
+                       placeholder="Ex: Séjour romantique à Paris">
+                <p class="hint">Minimum 3 caractères. Ex: "Vacances en famille à la plage"</p>
+                <div id="titleError" class="error"></div>
+            </div>
+            
+            <!-- Destination -->
+            <div class="form-group">
+                <label for="destination" class="required">Destination</label>
+                <input type="text" id="destination" name="destination" required 
+                       pattern="[A-Za-zÀ-ÿ\s]+" 
+                       minlength="3"
+                       placeholder="Ex: Paris, France">
+                <p class="hint">Lettres et espaces uniquement. Minimum 3 caractères.</p>
+                <div id="destinationError" class="error"></div>
+            </div>
+            
+            <!-- Dates -->
+            <div class="form-group">
+                <label for="departureDate" class="required">Date de départ</label>
+                <input type="date" id="departureDate" name="departureDate" required>
+                <p class="hint">Sélectionnez la date de départ du voyage</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="returnDate" class="required">Date de retour</label>
+                <input type="date" id="returnDate" name="returnDate" required>
+                <p class="hint">Sélectionnez la date de retour du voyage</p>
+            </div>
+            
+            <!-- Prix -->
+            <div class="form-group">
+                <label for="price" class="required">Prix (€)</label>
+                <input type="number" id="price" name="price" required 
+                       min="0" step="0.01"
+                       placeholder="Ex: 599.99">
+                <p class="hint">Prix en euros. Peut être décimal (ex: 499.99)</p>
+                <div id="priceError" class="error"></div>
+            </div>
+            
+            <!-- Catégorie -->
+            <div class="form-group">
+                <label for="category" class="required">Catégorie</label>
+                <select id="category" name="category" required>
+                    <option value="" disabled selected>Sélectionnez une catégorie</option>
+                    <option value="family">Voyage en famille</option>
+                    <option value="couple">Voyage en couple</option>
+                    <option value="adventure">Aventure et sports</option>
+                    <option value="cultural">Voyage culturel</option>
+                    <option value="beach">Séjour balnéaire</option>
+                </select>
+                <p class="hint">Choisissez la catégorie qui correspond le mieux</p>
+            </div>
+            
+            <!-- Description -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4"
+                          placeholder="Décrivez l'offre en détails..."></textarea>
+                <p class="hint">Facultatif mais recommandé pour attirer les clients</p>
+            </div>
+            
+            <!-- Image -->
+            <div class="form-group">
+                <label for="image">Image</label>
+                <input type="file" id="image" name="image" accept="image/*">
+                <p class="hint">Facultatif - Formats acceptés: JPG, PNG</p>
+            </div>
+            
+            <button type="submit">Enregistrer l'offre</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('travelOfferForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validation supplémentaire si nécessaire
+            let isValid = true;
+            
+            // Validation du titre
+            const title = document.getElementById('title');
+            if (title.value.length < 3) {
+                document.getElementById('titleError').textContent = 'Le titre doit contenir au moins 3 caractères';
+                isValid = false;
+            } else {
+                document.getElementById('titleError').textContent = '';
+            }
+            
+            // Validation de la destination
+            const destination = document.getElementById('destination');
+            const destinationPattern = /^[A-Za-zÀ-ÿ\s]+$/;
+            if (!destinationPattern.test(destination.value)) {
+                document.getElementById('destinationError').textContent = 'La destination ne doit contenir que des lettres';
+                isValid = false;
+            } else if (destination.value.length < 3) {
+                document.getElementById('destinationError').textContent = 'La destination doit contenir au moins 3 caractères';
+                isValid = false;
+            } else {
+                document.getElementById('destinationError').textContent = '';
+            }
+            
+            // Validation du prix
+            const price = document.getElementById('price');
+            if (price.value <= 0) {
+                document.getElementById('priceError').textContent = 'Le prix doit être positif';
+                isValid = false;
+            } else {
+                document.getElementById('priceError').textContent = '';
+            }
+            
+            if (isValid) {
+                alert('Formulaire valide! Enregistrement en cours...');
+                // Ici vous ajouteriez le code pour envoyer les données au serveur
+                // this.submit();
+            }
+        });
+    </script>
+</body>
+</html>
