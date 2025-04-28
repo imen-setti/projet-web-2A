@@ -25,7 +25,11 @@ class ReservationController {
         }
     }
     
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     public function afficherReservations() {
         try {
             $sql = "SELECT * FROM reservation";
@@ -71,7 +75,10 @@ public function updateReservationFromRequest() {
     return null;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
 public function supprimerReservation($idr) {
     try {
         $sql = "DELETE FROM reservation WHERE idr = :idr";

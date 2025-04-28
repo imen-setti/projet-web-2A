@@ -12,7 +12,11 @@ class User {
         $this->role = $role;
     }
 
+<<<<<<< HEAD
 
+=======
+    // getters
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     public function getNom() { return $this->nom; }
     public function getPrenom() { return $this->prenom; }
     public function getEmail() { return $this->email; }

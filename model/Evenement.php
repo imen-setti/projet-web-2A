@@ -10,7 +10,11 @@ class Evenement {
     private $idOrganisateur;
     private $image;
 
+<<<<<<< HEAD
     
+=======
+    // Constructeur
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     public function __construct($titre, $description, $categorie, $dateEvenement, $lieu, $idOrganisateur, $image= null) {
         $this->titre = $titre;
         $this->description = $description;
@@ -21,7 +25,11 @@ class Evenement {
         $this->image = $image;
     }
 
+<<<<<<< HEAD
     
+=======
+    // Getters et setters
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     public function getId() { return $this->id; }
     public function getTitre() { return $this->titre; }
     public function getDescription() { return $this->description; }

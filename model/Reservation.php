@@ -2,7 +2,11 @@
 class Reservation {
     private $idreservation;
     private $client;
+<<<<<<< HEAD
     private $idev;  
+=======
+    private $idev; 
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     private $date;
 
     public function __construct($client, $idev, $date) {

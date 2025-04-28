@@ -6,11 +6,19 @@ class UserController {
 
     
     public function ajouterUser(User $user) {
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         $sql = "SELECT * FROM user WHERE email = :email";
         $db = config::getConnexion();
         $req = $db->prepare($sql);
         $req->execute(['email' => $user->getEmail()]);
         
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         if ($req->rowCount() > 0) {
             echo '<div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; width: 300px;">
                     <strong>Erreur!</strong>User déjà inscrit, Cet email est déjà utilisé.
@@ -46,7 +54,11 @@ class UserController {
                     window.location.href = "index.php";
                 }, 3000);
               </script>';
+<<<<<<< HEAD
         exit(); 
+=======
+        exit();
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     }
     
 
@@ -84,8 +96,13 @@ class UserController {
     }
 
 
+<<<<<<< HEAD
     
     public function modifierUser($id, User $user) {
+=======
+
+    public function modifierUser($id, User $user) {    
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         // Remarque : le champ password est ici laissé vide si vous ne souhaitez pas le modifier.
         // Vous pouvez adapter cette logique pour gérer la modification du mot de passe.
         $sql = "UPDATE user SET 
@@ -115,12 +132,20 @@ class UserController {
     public function update() {
         if (isset($_POST['id'])) {
             $id = $_POST['id'];
+<<<<<<< HEAD
     
+=======
+           
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
             $user = new User(
                 $_POST['nom'],
                 $_POST['prenom'],
                 $_POST['email'],
+<<<<<<< HEAD
                 $_POST['password'], // Mot de passe non modifié ici
+=======
+                $_POST['password'],
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
                 $_POST['numtel'],
                 $_POST['sexe'],
                 $_POST['role']
@@ -132,6 +157,10 @@ class UserController {
     }
 
     
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     public function delete() {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];

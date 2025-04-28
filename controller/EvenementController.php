@@ -4,18 +4,34 @@ require_once __DIR__ . '/../model/Evenement.php';
 
 class EvenementController {
 
+<<<<<<< HEAD
     public function ajouterEvenement(Evenement $evenement) {
+=======
+    
+    public function ajouterEvenement(Evenement $evenement) {
+        
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         $sql = "SELECT * FROM evenement WHERE titre = :titre";
         $db = config::getConnexion();
         $req = $db->prepare($sql);
         $req->execute(['titre' => $evenement->getTitre()]);
     
         if ($req->rowCount() > 0) {
+<<<<<<< HEAD
             header('Location: evenementback.php?error=Cet événement existe déjà');
             exit();
         }
     
 
+=======
+            // Vous pouvez choisir de renvoyer un message ou d'utiliser les sessions pour les flash messages
+            // Ici, nous redirigeons avec un message d'erreur dans l'URL
+            header(header: 'Location: evenementback.php?error=Cet événement existe déjà');
+            exit();
+        }
+    
+        // Insertion de l'événement
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         $sql = "INSERT INTO evenement (titre, description, categorie, date, lieu, idorganisateur, image)
                 VALUES (:titre, :description, :categorie, :date, :lieu, :idorganisateur, :image)";
         $req = $db->prepare($sql);
@@ -42,6 +58,10 @@ class EvenementController {
             isset($_POST['lieu']) &&
             isset($_POST['idorganisateur'])
         ) {
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
             $imageName = null;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
                 $targetDir = "../back/assets/uploads/";
@@ -51,6 +71,10 @@ class EvenementController {
     
                 $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
                 $targetFilePath = $targetDir . $imageName;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
                 $check = getimagesize($_FILES["image"]["tmp_name"]);
                 if ($check !== false) {
                     move_uploaded_file($_FILES["image"]["tmp_name"], $targetFilePath);
@@ -60,6 +84,10 @@ class EvenementController {
                 }
             }
     
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
             $evenement = new Evenement(
                 $_POST['titre'],
                 $_POST['description'],
@@ -86,9 +114,17 @@ class EvenementController {
         return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+<<<<<<< HEAD
     public function supprimerEvenement($id) {
         try {
             $db = config::getConnexion();
+=======
+    
+    public function supprimerEvenement($id) {
+        try {
+            $db = config::getConnexion();
+             // Supprimer les réservations liées
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         $sqlRes = "DELETE FROM reservation WHERE idev = :id";
         $reqRes = $db->prepare($sqlRes);
         $reqRes->bindParam(':id', $id, PDO::PARAM_INT);
@@ -113,6 +149,7 @@ class EvenementController {
         }
     }
 
+<<<<<<< HEAD
     public function delete() {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
@@ -124,6 +161,9 @@ class EvenementController {
     }
 
 
+=======
+    
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
     public function modifierEvenement($id, Evenement $evenement) {
         $sql = "UPDATE evenement SET 
                     titre = :titre,
@@ -148,10 +188,20 @@ class EvenementController {
     }
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
 public function update() {
     if (isset($_POST['id'])) {
         $id = $_POST['id'];
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         $evenement = new Evenement(
             $_POST['titre'],
             $_POST['description'],
@@ -161,6 +211,10 @@ public function update() {
             $_POST['idorganisateur']
         );
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
         $this->modifierEvenement($id, $evenement);
 
         header('Location: evenementback.php?success=Événement mis à jour avec succès');
@@ -171,5 +225,18 @@ public function update() {
     }
 }
 
+<<<<<<< HEAD
+=======
+
+    public function delete() {
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $this->supprimerEvenement($id);
+        } else {
+            header('Location: evenementback.php?error=Aucun ID spécifié pour la suppression');
+            exit;
+        }
+    }
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
 }
 ?>

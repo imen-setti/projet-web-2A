@@ -89,6 +89,10 @@ try {
                     <a href="reserver.php?idev=<?= $row['idevenement']; ?>" class="btn btn-sm btn-outline-primary me-1 rounded-pill">Réserver</a>
                     <a href="evenement_details.php?idev=<?= $row['idevenement']; ?>" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Voir plus</a>
 
+<<<<<<< HEAD
+=======
+                        
+>>>>>>> 70499b9bcc7183004bd0a9a31ee83419233a63a4
                     </div>
                 </div>
                 <div class="text-center p-4 pb-2 flex-grow-1">
