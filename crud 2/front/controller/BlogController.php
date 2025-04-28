@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../Model/Blog.php');
+require_once(__DIR__ . '../../Model/Blog.php');
 
 // Fonction de validation de base
 function isValidData($id_user, $titre, $auteur, $date_creation, $contenu) {
@@ -14,7 +14,7 @@ function isValidData($id_user, $titre, $auteur, $date_creation, $contenu) {
 
 $errors = [];
 $id_user = $titre = $auteur = $date_creation = $contenu = $image = "";
-
+29563894
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_user = trim($_POST['id_user']);
     $titre = trim($_POST['titre']);
@@ -54,11 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($errors)) {
         $blog = new Blog($id_user, $titre, $auteur, $date_creation, $image, $contenu);
         $blog->ajouterBlog();
-        header("Location: ./../blog.php");
+        header("Location: ./../Blog.php");
         exit();
     } else {
         // Recharger le formulaire avec les messages d’erreurs
-        include(__DIR__ . './../addBlog.php');
+        include(__DIR__ . '/../addBlog.php');
     }
 }
 ?>

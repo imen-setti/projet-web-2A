@@ -61,6 +61,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link active bg-gradient-dark text-white" href="../view/listeCommentaire.php">
+            <i class="material-symbols-rounded opacity-5">table_view</i>
+            <span class="nav-link-text ms-1">Comments</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link text-dark" href="../pages/billing.html">
             <i class="material-symbols-rounded opacity-5">receipt_long</i>
             <span class="nav-link-text ms-1">Billing</span>

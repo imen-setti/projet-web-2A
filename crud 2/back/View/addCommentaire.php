@@ -1,103 +1,17 @@
-<?php
-// Démarrer la mise en tampon de la sortie pour éviter les erreurs de redirection
-ob_start();
+<!--
+=========================================================
+* Material Dashboard 3 - v3.2.0
+=========================================================
 
-require_once('../model/Blog.php');
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2024 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
 
-if (!isset($_GET['id'])) {
-    header("Location: listeBlog.php?error=ID du blog manquant.");
-    exit();
-}
+=========================================================
 
-$id_blog = $_GET['id']; 
-$blog = Blog::getBlogById($id_blog);
-
-if (!$blog) {
-    header("Location: listeBlog.php?error=Blog introuvable.");
-    exit();
-}
-
-// Initialisation du tableau d'erreurs
-$errors = [];
-
-// Traitement du formulaire
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Récupération des valeurs du formulaire
-    $id_user = $_POST['id_user'];
-    $titre = $_POST['titre'];
-    $auteur = $_POST['auteur'];
-    $date_creation = $_POST['date_creation'];
-    $contenu = $_POST['contenu'];
-
-    // Validation de l'id_user
-    if (!preg_match('/^\d+$/', $id_user)) {
-        $errors['id_user'] = "L'identifiant utilisateur doit être un nombre.";
-    }
-
-    // Validation du titre
-    if (empty($titre)) {
-        $errors['titre'] = "Le titre est requis.";
-    } elseif (strlen($titre) < 3) {
-        $errors['titre'] = "Le titre doit contenir au moins 3 caractères.";
-    }
-
-    // Validation de l'auteur
-    if (empty($auteur)) {
-        $errors['auteur'] = "Le nom de l'auteur est requis.";
-    } elseif (strlen($auteur) < 3) {
-        $errors['auteur'] = "Le nom de l'auteur doit contenir au moins 3 caractères.";
-    }
-
-    // Validation de la date de création
-    if (empty($date_creation)) {
-        $errors['date_creation'] = "La date de création est requise.";
-    }
-
-    // Validation du contenu
-    if (empty($contenu)) {
-        $errors['contenu'] = "Le contenu est requis.";
-    } elseif (strlen($contenu) < 50) {
-        $errors['contenu'] = "Le contenu doit contenir au moins 50 caractères.";
-    }
-
-    // Vérifie si une image a été téléchargée
-    $image = null;
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $image = $_FILES['image']['name'];
-        $target = "../uploads/" . basename($image);
-        
-        // Vérification de la taille et du type d'image
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!in_array($_FILES['image']['type'], $allowed_types)) {
-            $errors['image'] = "L'image doit être un fichier de type JPEG, PNG ou GIF.";
-        }
-        
-        // Vérification de la taille de l'image (maximum 5 Mo)
-        if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
-            $errors['image'] = "L'image ne doit pas dépasser 5 Mo.";
-        }
-
-        if (!$errors['image']) {
-            move_uploaded_file($_FILES['image']['tmp_name'], $target);
-        }
-    } else {
-        // Si aucune image n'a été téléchargée, conserve l'image existante
-        $image = $blog['image'];
-    }
-
-    // Si aucune erreur, procéder à la modification
-    if (empty($errors)) {
-        Blog::modifierBlog($id_blog, $id_user, $titre, $auteur, $date_creation, $image, $contenu);
-        header("Location: ./../view/listeBlog.php");
-        exit();
-    }
-}
-
-// Fin de la mise en tampon de la sortie
-ob_end_flush();
-?>
-
-
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -144,6 +58,12 @@ ob_end_flush();
           <a class="nav-link active bg-gradient-dark text-white" href="../view/listeBlog.php">
             <i class="material-symbols-rounded opacity-5">table_view</i>
             <span class="nav-link-text ms-1">Blogs</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active bg-gradient-dark text-white" href="../view/listeCommentaire.php">
+            <i class="material-symbols-rounded opacity-5">table_view</i>
+            <span class="nav-link-text ms-1">Comments</span>
           </a>
         </li>
         <li class="nav-item">
@@ -214,7 +134,7 @@ ob_end_flush();
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
             <div class="input-group input-group-outline">
               <label class="form-label">Type here...</label>
-              <input type="text" class="form-control">
+              <input type="text" class="">
             </div>
           </div>
           <ul class="navbar-nav d-flex align-items-center  justify-content-end">
@@ -321,77 +241,72 @@ ob_end_flush();
       </div>
     </nav>
     <!-- End Navbar -->
-
-<!-- Design HTML Bootstrap / Creative Tim -->
-<div class="container mt-5">
+    <!-- Design HTML Bootstrap / Creative Tim -->
+    <div class="container mt-5">
   <div class="card shadow-lg">
     <div class="card-header bg-gradient-dark text-white d-flex justify-content-between align-items-center">
-      <h5 class="text-white text-capitalize m-0">Modifier le Blog</h5>
-      <a href="listeBlog.php" class="btn btn-sm btn-light text-dark font-weight-bold">← Retour</a>
+      <h5 class="text-white text-capitalize m-0">Ajouter un Commentaire</h5>
+      <a href="listeCommentaire.php" class="btn btn-sm btn-light text-dark font-weight-bold">📚 Voir la liste</a>
     </div>
     <div class="card-body">
-      <form method="post" enctype="multipart/form-data">
-        
+      <form action="../controller/CommentaireController.php" method="POST">
+        <?php if (!isset($errors)) $errors = []; ?>
+
         <!-- ID User -->
         <div class="mb-3">
           <label class="form-label">ID User :</label>
-          <input type="text" name="id_user" value="<?= htmlspecialchars($blog['id_user']) ?>">
-          <?php if (!empty($errors['id_user'])): ?>
+          <input type="text" name="id_user" value="<?= htmlspecialchars($_POST['id_user'] ?? '') ?>" class="">
+          <?php if (isset($errors['id_user'])): ?>
             <div class="text-danger"><?= $errors['id_user'] ?></div>
           <?php endif; ?>
         </div>
 
-        <!-- Titre -->
+        <!-- ID Blog (liste déroulante) -->
         <div class="mb-3">
-          <label class="form-label">Titre :</label>
-          <input type="text" name="titre" value="<?= htmlspecialchars($blog['titre']) ?>">
-          <?php if (!empty($errors['titre'])): ?>
-            <div class="text-danger"><?= $errors['titre'] ?></div>
-          <?php endif; ?>
-        </div>
+          <label class="form-label">Blog associé :</label>
+          <select name="id_blog" class="form-select">
+  <option value="">-- Sélectionnez un blog --</option>
+  <?php
+            require_once '../model/Blog.php';
 
-        <!-- Auteur -->
-        <div class="mb-3">
-          <label class="form-label">Auteur :</label>
-          <input type="text" name="auteur" value="<?= htmlspecialchars($blog['auteur']) ?>">
-          <?php if (!empty($errors['auteur'])): ?>
-            <div class="text-danger"><?= $errors['auteur'] ?></div>
+            $blogs = Blog::listeBlogs();
+
+foreach ($blogs as $blog): ?>
+    <option value="<?= $blog['id_blog'] ?>" <?= (isset($_POST['id_blog']) && $_POST['id_blog'] == $blog['id']) ? 'selected' : '' ?>>
+      <?= htmlspecialchars($blog['titre']) ?> (ID: <?= $blog['id_blog'] ?>)
+    </option>
+  <?php endforeach; ?>
+</select>
+
+          <?php 
+          if (isset($errors['id_blog'])): ?>
+            <div class="text-danger"><?= $errors['id_blog'] ?></div>
           <?php endif; ?>
         </div>
 
         <!-- Date de création -->
         <div class="mb-3">
           <label class="form-label">Date de création :</label>
-          <input type="date" name="date_creation" value="<?= htmlspecialchars($blog['date_creation']) ?>">
+          <input type="date" name="date_creation" value="<?= htmlspecialchars($_POST['date_creation'] ?? '') ?>" class="">
           <?php if (!empty($errors['date_creation'])): ?>
             <div class="text-danger"><?= $errors['date_creation'] ?></div>
-          <?php endif; ?>
-        </div>
-
-        <!-- Image -->
-        <div class="mb-3">
-          <label class="form-label">Image :</label>
-          <input type="file" name="image" accept="image/*">
-          <?php if (!empty($errors['image'])): ?>
-            <div class="text-danger"><?= $errors['image'] ?></div>
           <?php endif; ?>
         </div>
 
         <!-- Contenu -->
         <div class="mb-3">
           <label class="form-label">Contenu :</label>
-          <textarea name="contenu" rows="5"><?= htmlspecialchars($blog['contenu']) ?></textarea>
+          <textarea name="contenu" rows="5" class=""><?= htmlspecialchars($_POST['contenu'] ?? '') ?></textarea>
           <?php if (!empty($errors['contenu'])): ?>
             <div class="text-danger"><?= $errors['contenu'] ?></div>
           <?php endif; ?>
         </div>
 
-        <button type="submit" class="btn btn-dark">💾 Enregistrer les modifications</button>
+        <button type="submit" class="btn btn-dark">➕ Ajouter</button>
       </form>
     </div>
   </div>
 </div>
-
 
       <footer class="footer py-4  ">
         <div class="container-fluid">

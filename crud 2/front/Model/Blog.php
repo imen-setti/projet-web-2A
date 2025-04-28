@@ -8,6 +8,7 @@ class Blog {
     public $date_creation;
     public $image;
     public $contenu;
+    
 
     public function __construct($id_user, $titre, $auteur, $date_creation, $image, $contenu) {
         $this->id_user = $id_user;
@@ -74,6 +75,14 @@ class Blog {
         $stmt->bindParam(':contenu', $contenu);
         $stmt->execute();
     }
-    
+    public static function listeBlogsSorted($order = 'desc') {
+        global $conn;
+        $order = strtolower($order) === 'asc' ? 'ASC' : 'DESC';
+        $req = "SELECT * FROM blog ORDER BY date_creation $order";
+        $stmt = $conn->prepare($req);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+        
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/Model/Blog.php');
+require_once(__DIR__ . '/../Model/Blog.php');
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];

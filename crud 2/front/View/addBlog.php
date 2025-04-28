@@ -1,9 +1,55 @@
 <?php
-require_once(__DIR__ . '/Model/Blog.php');
-    
-    // Récupérer tous les blogs
-    $blogs = Blog::listeBlogs();
-    ?>
+require_once(__DIR__ . '/../Model/Blog.php');
+require_once(__DIR__ . '/../config.php'); // si tu as un fichier de connexion à la BDD
+
+$errors = [];
+$id_user = $titre = $auteur = $date_creation = $contenu = $image = "";
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $id_user = trim($_POST['id_user']);
+    $titre = trim($_POST['titre']);
+    $auteur = trim($_POST['auteur']);
+    $date_creation = $_POST['date_creation'];
+    $contenu = trim($_POST['contenu']);
+
+    // ✅ VALIDATION
+    if (!preg_match('/^\d+$/', $id_user)) {
+        $errors['id_user'] = "ID utilisateur invalide.";
+    }
+    if (!preg_match('/^[a-zA-Z\s]+$/', $titre)) {
+        $errors['titre'] = "Le titre ne doit contenir que des lettres et espaces.";
+    }
+    if (!preg_match('/^[a-zA-Z\s]+$/', $auteur)) {
+        $errors['auteur'] = "L'auteur doit contenir uniquement des lettres et espaces.";
+    }
+    if (empty($date_creation)) {
+        $errors['date_creation'] = "La date est obligatoire.";
+    }
+    if (strlen($contenu) < 50) {
+        $errors['contenu'] = "Le contenu doit faire au moins 50 caractères.";
+    }
+
+    // ✅ TRAITEMENT DE L’IMAGE
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $image = uniqid("blog_", true) . '.' . $extension;
+        $target = __DIR__ . '/../../back/uploads/' . basename($image);
+        move_uploaded_file($_FILES['image']['tmp_name'], $target);
+    } else {
+        $image = ""; // ou image par défaut
+    }
+
+    // ✅ AJOUT DANS LA BDD SI PAS D’ERREURS
+    if (empty($errors)) {
+        $blog = new Blog($id_user, $titre, $auteur, $date_creation, $image, $contenu);
+        $blog->ajouterBlog();
+        header("Location: Blog.php"); // redirection après succès
+        exit();
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,7 +60,7 @@ require_once(__DIR__ . '/Model/Blog.php');
     <meta content="" name="description" />
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon" />
+    <link href="../img/favicon.ico" rel="icon" />
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,14 +81,14 @@ require_once(__DIR__ . '/Model/Blog.php');
     />
 
     <!-- Libraries Stylesheet -->
-    <link href="lib/animate/animate.min.css" rel="stylesheet" />
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+    <link href="../lib/animate/animate.min.css" rel="stylesheet" />
+    <link href="../lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
 
     <!-- Template Stylesheet -->
-    <link href="css/style.css" rel="stylesheet" />
+    <link href="../css/style.css" rel="stylesheet" />
   </head>
 
   <body>
@@ -110,82 +156,87 @@ require_once(__DIR__ . '/Model/Blog.php');
 
     <!-- Header Start -->
 
-    <style>
-  .card-img-container {
-    height: 180px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-color: #f8f9fa;
-  }
 
-  .card-img-container img {
-    max-height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-  }
 
-  .card-title {
-    min-height: 48px;
-  }
 
-  .card-text {
-    min-height: 80px;
-  }
-</style>
-
-<div class="container-fluid bg-primary py-5 mb-5 page-header">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-10 text-center">
-        <h1 class="display-3 text-white animated slideInDown">Blog</h1>
-      </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifier le Blog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-gradient-dark text-white d-flex justify-content-between align-items-center">
+      <h5 class="text-black text-capitalize m-0">Ajouter un Blog</h5>
+      <a href="blog.php" class="btn btn-sm btn-light text-dark font-weight-bold">📚 Voir la liste</a>
     </div>
-  </div>
+    <div class="card-body">
+    <form action="" method="POST" enctype="multipart/form-data">
+        <!-- ID User -->
+        <?php if (!isset($errors)) $errors = []; ?>
+
+<div class="mb-3">
+  <label class="form-label">ID User :</label>
+  <input type="text" name="id_user" value="<?= htmlspecialchars($_POST['id_user'] ?? '') ?>">
+  <?php if (isset($errors['id_user'])): ?>
+    <div class="text-danger"><?= $errors['id_user'] ?></div>
+  <?php endif; ?>
 </div>
 
-<div class="container py-5">
-<div class="d-flex justify-content-end mb-4">
-    <a href="addBlog.php" class="btn btn-success">Ajouter un Blog</a>
-  </div>
-  <div class="row">
-    <?php foreach ($blogs as $blog): ?>
-    <div class="col-lg-4 col-md-6 mb-4 d-flex">
-      <div class="card shadow-lg h-100 w-100 d-flex flex-column">
-        
-        <!-- Image centrée -->
-        <div class="card-img-container">
-          <?php if (!empty($blog['image']) && file_exists('../back/uploads/' . $blog['image'])): ?>
-            <img src="<?= '../back/uploads/' . htmlspecialchars($blog['image']) ?>" alt="Image du blog">
-          <?php else: ?>
-            <span class="text-muted">Aucune image</span>
-          <?php endif; ?>
-        </div>
+<!-- Titre -->
+<div class="mb-3">
+  <label class="form-label">Titre :</label>
+  <input type="text" name="titre" value="<?= htmlspecialchars($_POST['titre'] ?? '') ?>">
+  <?php if (isset($errors['titre'])): ?>
+    <div class="text-danger"><?= $errors['titre'] ?></div>
+  <?php endif; ?>
+</div>
 
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><?= htmlspecialchars($blog['titre']) ?></h5>
-          <p class="card-text"><?= htmlspecialchars(substr($blog['contenu'], 0, 150)) ?>...</p>
-        </div>
+<!-- Auteur -->
+<div class="mb-3">
+  <label class="form-label">Auteur :</label>
+  <input type="text" name="auteur" value="<?= htmlspecialchars($_POST['auteur'] ?? '') ?>">
+  <?php if (isset($errors['auteur'])): ?>
+    <div class="text-danger"><?= $errors['auteur'] ?></div>
+  <?php endif; ?>
+</div>
 
-        <div class="card-footer mt-auto d-flex justify-content-between align-items-center">
-          <small class="text-muted">
-            Posté par <?= htmlspecialchars($blog['auteur']) ?> <br>
-            le <?= htmlspecialchars($blog['date_creation']) ?>
-          </small>
-          <div>
-            <a href="editBlog.php?id=<?= $blog['id_blog'] ?>" class="btn btn-sm btn-outline-primary me-1">
-              ✏️
-            </a>
-            <a href="deleteBlog.php?id=<?= $blog['id_blog'] ?>" class="btn btn-sm btn-outline-danger"
-               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce blog ?');">
-              🗑️
-            </a>
-          </div>
-        </div>
-      </div>
+<!-- Date de création -->
+<div class="mb-3">
+  <label class="form-label">Date de création :</label>
+  <input type="date" name="date_creation" value="<?= htmlspecialchars($_POST['date_creation'] ?? '') ?>">
+  <?php if (!empty($errors['date_creation'])): ?>
+    <div class="text-danger"><?= $errors['date_creation'] ?></div>
+  <?php endif; ?>
+</div>
+
+
+<!-- Image -->
+<div class="mb-3">
+  <label class="form-label">Image :</label>
+  <input type="file" name="image" accept="image/*">
+  <?php if (!empty($errors['image'])): ?>
+    <div class="text-danger"><?= $errors['image'] ?></div>
+  <?php endif; ?>
+</div>
+
+
+<!-- Contenu -->
+<div class="mb-3">
+  <label class="form-label">Contenu :</label>
+  <textarea name="contenu" rows="5"><?= htmlspecialchars($_POST['contenu'] ?? '') ?></textarea>
+  <?php if (!empty($errors['contenu'])): ?>
+    <div class="text-danger"><?= $errors['contenu'] ?></div>
+  <?php endif; ?>
+</div>
+
+
+        <button type="submit" class="btn btn-dark">➕ Ajouter</button>
+      </form>
     </div>
-    <?php endforeach; ?>
   </div>
 </div>
     <!-- Header End -->
@@ -237,42 +288,42 @@ require_once(__DIR__ . '/Model/Blog.php');
               <div class="col-4">
                 <img
                   class="img-fluid bg-light p-1"
-                  src="img/course-1.jpg"
+                  src="../img/course-1.jpg"
                   alt=""
                 />
               </div>
               <div class="col-4">
                 <img
                   class="img-fluid bg-light p-1"
-                  src="img/course-2.jpg"
+                  src="../img/course-2.jpg"
+                  alt=""
+                />
+              </div>
+              <div class="col-4">
+                <img
+                  class="../img-fluid bg-light p-1"
+                  src="../img/course-3.jpg"
                   alt=""
                 />
               </div>
               <div class="col-4">
                 <img
                   class="img-fluid bg-light p-1"
-                  src="img/course-3.jpg"
+                  src="../img/course-2.jpg"
                   alt=""
                 />
               </div>
               <div class="col-4">
                 <img
                   class="img-fluid bg-light p-1"
-                  src="img/course-2.jpg"
+                  src="../img/course-3.jpg"
                   alt=""
                 />
               </div>
               <div class="col-4">
                 <img
                   class="img-fluid bg-light p-1"
-                  src="img/course-3.jpg"
-                  alt=""
-                />
-              </div>
-              <div class="col-4">
-                <img
-                  class="img-fluid bg-light p-1"
-                  src="img/course-1.jpg"
+                  src="../img/course-1.jpg"
                   alt=""
                 />
               </div>
@@ -336,12 +387,12 @@ require_once(__DIR__ . '/Model/Blog.php');
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/wow/wow.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="../lib/wow/wow.min.js"></script>
+    <script src="../lib/easing/easing.min.js"></script>
+    <script src="../lib/waypoints/waypoints.min.js"></script>
+    <script src="../lib/owlcarousel/owl.carousel.min.js"></script>
 
     <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+    <script src="../js/main.js"></script>
   </body>
 </html>
