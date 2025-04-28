@@ -45,7 +45,7 @@ $evenements = $evenementController->afficherEvenements();
     <link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="assets/img/favicon.png">
     <title>
-    StartHUB
+    StartHub
     </title>
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -258,6 +258,32 @@ $evenements = $evenementController->afficherEvenements();
     <?php if (isset($_GET['success'])): ?>
         <div class="alert alert-success"><?= htmlspecialchars($_GET['success']) ?></div>
     <?php endif; ?>
+    <div class="d-flex justify-content-end mb-3">
+        <button id="sortDateBtn" class="btn btn-primary me-2">Trier par Date ↑↓</button>
+        <button onclick="window.location.href='statistiques.php'" class="btn btn-info">
+            <i class="fas fa-chart-pie me-2"></i>Statistiques
+        </button>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3">
+  <button id="sortDateBtn" class="btn btn-primary">Trier par Date ↑↓</button>
+</div>
+
+    <!-- Choix de la catégorie à filtrer (centré) -->
+    <div class="row mt-4 justify-content-center">
+    <div class="col-md-6">
+        <select id="searchCategorie" class="form-select text-center">
+        <option value="">chercher une catégorie d'évenement</option>
+        <option value="séminaire">Séminaire</option>
+        <option value="conférence">Conférence</option>
+        <option value="networking">Networking</option>
+        <option value="atelier">Atelier</option>
+        <option value="webinaire">Webinaire</option>
+        <!-- Ajoute d'autres catégories si besoin -->
+        </select>
+    </div>
+    </div>
+
 
     <!-- Bouton Ajouter un événement -->
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#ajoutModal">Ajouter un événement</button>
@@ -286,10 +312,18 @@ $evenements = $evenementController->afficherEvenements();
                         </div>
 
                         <div class="mb-3">
-                            <label for="categorie" class="form-label">Catégorie</label>
-                            <input type="text" class="form-control" id="categorie" name="categorie">
-                            <span class="error text-danger" id="errorCategorie"></span>
-                        </div>
+    <label for="categorie" class="form-label">Catégorie</label>
+    <select class="form-control" id="categorie" name="categorie">
+        <option value="">Sélectionner une catégorie</option>
+        <option value="Webinaire">Webinaire</option>
+        <option value="Atelier">Atelier</option>
+        <option value="Networking">Networking</option>
+        <option value="Conférence">Conférence</option>
+        <option value="Séminaire">Séminaire</option>
+    </select>
+    <span class="error text-danger" id="errorCategorie"></span>
+</div>
+
 
                         <div class="mb-3">
                             <label for="date" class="form-label">Date</label>
@@ -336,7 +370,7 @@ $evenements = $evenementController->afficherEvenements();
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="eventTableBody">
         <?php foreach ($evenements as $evenement): ?>
             <tr>
                 <td><?= htmlspecialchars($evenement['titre']) ?></td>
@@ -410,6 +444,39 @@ $evenements = $evenementController->afficherEvenements();
                 </div>
             </div>
         <?php endforeach; ?>
+        <script>
+    document.getElementById("searchCategorie").addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#eventTableBody tr");
+
+        rows.forEach(row => {
+            const categorie = row.children[2].textContent.toLowerCase(); // 3e colonne = catégorie
+            row.style.display = categorie.includes(searchTerm) ? "" : "none";
+        });
+    });
+</script>
+<script>
+  let triDateAsc = true;
+
+  document.getElementById("sortDateBtn").addEventListener("click", function () {
+    const tbody = document.getElementById("eventTableBody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    rows.sort((a, b) => {
+      const dateA = new Date(a.children[3].textContent.trim()); // colonne "Date"
+      const dateB = new Date(b.children[3].textContent.trim());
+
+      return triDateAsc ? dateA - dateB : dateB - dateA;
+    });
+
+    // Réinsérer les lignes triées
+    rows.forEach(row => tbody.appendChild(row));
+
+    triDateAsc = !triDateAsc;
+  });
+</script>
+
+
     </tbody>
 </table>
 

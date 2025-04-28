@@ -99,7 +99,10 @@ try {
                                     <p class="fs-5 mb-4 pb-2"><strong>Description :</strong><br><?= nl2br(htmlspecialchars($evenement['description'])); ?></p>
 
                                     <a href="reserver.php?idev=<?= $evenement['idevenement']; ?>" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">S'inscrire</a>
-                                    <a href="javascript:history.back()" class="btn btn-light py-md-3 px-md-5 animated slideInRight">Retour</a>
+                                    <a href="javascript:history.back()" class="btn btn-light py-md-3 px-md-5 me-3 animated slideInRight">Retour</a>
+                                    <a href="maps.php?address=<?= urlencode($evenement['lieu'] . ', Tunis, Tunisie'); ?>" class="btn btn-info py-md-3 px-md-5 animated slideInRight">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Localisation
+                                    </a>
                                 </div>
                             </div>
                         </div>

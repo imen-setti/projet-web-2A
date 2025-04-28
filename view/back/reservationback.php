@@ -39,7 +39,7 @@ $reservations = $reservationController->afficherReservations();
     <link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="assets/img/favicon.png">
     <title>
-    StartHUB
+    StartHub
     </title>
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
@@ -256,6 +256,10 @@ $reservations = $reservationController->afficherReservations();
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
+    <div class="d-flex justify-content-end mb-3">
+  <button id="sortNomBtn" class="btn btn-primary">Trier par Nom des clients ↑↓</button>
+</div>
+
     <!-- Tableau des réservations -->
     <table class="table table-bordered">
         <thead class="table-dark">
@@ -267,7 +271,7 @@ $reservations = $reservationController->afficherReservations();
             <th>Actions</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id ="reservationTableBody">
         <?php if (!empty($reservations)): ?>
             <?php foreach ($reservations as $res): ?>
                 <tr>
@@ -300,8 +304,30 @@ $reservations = $reservationController->afficherReservations();
                 <td colspan="5" class="text-center">Aucune réservation trouvée.</td>
             </tr>
         <?php endif; ?>
+        
         </tbody>
     </table>
+    <script>
+  let triNomAsc = true;
+
+  document.getElementById("sortNomBtn").addEventListener("click", function () {
+    const tbody = document.getElementById("reservationTableBody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    rows.sort((a, b) => {
+      const nomA = a.children[0].textContent.trim().toLowerCase();
+      const nomB = b.children[0].textContent.trim().toLowerCase();
+
+      if (nomA < nomB) return triNomAsc ? -1 : 1;
+      if (nomA > nomB) return triNomAsc ? 1 : -1;
+      return 0;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+    triNomAsc = !triNomAsc;
+  });
+</script>
+
 </div>
 <!-- Modal pour la modification -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">

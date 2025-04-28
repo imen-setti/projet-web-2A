@@ -1,29 +1,103 @@
 <?php
 require_once __DIR__ . '/../config/connexion.php';
 require_once __DIR__ . '/../model/Reservation.php';
+require_once __DIR__ . '/vendor/autoload.php'; // charge PHPMailer automatiquement
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class ReservationController {
 
+   
+    
+    
+    
     public function ajouterReservation(Reservation $reservation) {
         if (empty($reservation->getIdev())) {
             return ['success' => false, 'message' => 'Aucun événement sélectionné'];
         }
     
         try {
-            $sql = "INSERT INTO reservation (client, idev, date)
-                    VALUES (:client, :idev, :date)";
             $db = config::getConnexion();
+            $sqlCheck = "SELECT COUNT(*) FROM reservation WHERE client = :client AND idev = :idev";
+        $stmtCheck = $db->prepare($sqlCheck);
+        $stmtCheck->execute(['client' => $reservation->getClient(), 'idev' => $reservation->getIdev()]);
+        $existingReservation = $stmtCheck->fetchColumn();
+
+        if ($existingReservation > 0) {
+            // Le client est déjà inscrit à cet événement
+            return ['success' => false, 'message' => 'Ce client est déjà inscrit à cet événement.'];
+        }
+    
+            // Générer un code de confirmation unique (6 chiffres aléatoires par ex)
+            $codeConfirmation = random_int(100000, 999999);
+    
+            // 1. Ajouter la réservation avec code
+            $sql = "INSERT INTO reservation (client, idev, date, code_confirmation)
+                    VALUES (:client, :idev, :date, :code_confirmation)";
             $req = $db->prepare($sql);
             $req->execute([
                 'client' => $reservation->getClient(),
                 'idev'   => $reservation->getIdev(),
-                'date'   => $reservation->getDate()
+                'date'   => $reservation->getDate(),
+                'code_confirmation' => $codeConfirmation
             ]);
-            return ['success' => true, 'message' => 'Inscription réalisée avec succès'];
+    
+            // 2. Récupérer l'email du client via jointure
+            $sqlEmail = "SELECT u.email 
+                         FROM user u
+                         WHERE u.nom = :client
+                         LIMIT 1";
+            $stmtEmail = $db->prepare($sqlEmail);
+            $stmtEmail->execute(['client' => $reservation->getClient()]);
+            $emailData = $stmtEmail->fetch(PDO::FETCH_ASSOC);
+    
+            if ($emailData && isset($emailData['email'])) {
+                $emailClient = $emailData['email'];
+    
+                // 3. Envoyer l'email de confirmation de code
+                $mail = new PHPMailer(true);
+    
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'sodratisarra2@gmail.com'; 
+                    $mail->Password = 'unol uhil gubt ytmx'; 
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+                    $mail->SMTPOptions = [
+                        'ssl' => [
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        ]
+                    ];
+    
+                    $mail->setFrom('sodratisarra2@gmail.com', 'StartHub');
+                    $mail->addAddress($emailClient, $reservation->getClient());
+                    $mail->Subject = 'Code de confirmation de reservation';
+                    $mail->Body = "Bonjour " . htmlspecialchars($reservation->getClient()) . ",\n\n"
+                                . "Voici votre code de confirmation : " . $codeConfirmation . "\n\n"
+                                . "Veuillez saisir ce code pour confirmer votre inscription.\n\nCordialement.";
+    
+                    $mail->send();
+    
+                    // Rediriger vers la page de vérification
+                    header('Location: verifier.php?client=' . urlencode($reservation->getClient()));
+                    exit();
+    
+                } catch (Exception $e) {
+                    return ['success' => true, 'message' => 'Inscription OK mais erreur d\'envoi d\'email : ' . $mail->ErrorInfo];
+                }
+            } else {
+                return ['success' => true, 'message' => 'Inscription réalisée, mais email du client introuvable'];
+            }
+    
         } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Erreur lors de l\'inscription'];
+            return ['success' => false, 'message' => 'Erreur lors de l\'inscription : ' . $e->getMessage()];
         }
     }
+    
     
 
     public function afficherReservations() {

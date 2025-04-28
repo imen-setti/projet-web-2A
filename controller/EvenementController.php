@@ -170,6 +170,20 @@ public function update() {
         exit;
     }
 }
-
+public function trierParDate($ordre = 'ASC') {
+    try {
+        $db = config::getConnexion();
+        $sql = "SELECT * FROM evenement ORDER BY date $ordre";
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+public function statistiquesParCategorie() {
+    $sql = "SELECT categorie, COUNT(*) AS total FROM evenement GROUP BY categorie";
+    $db = config::getConnexion();
+    return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
 }
 ?>

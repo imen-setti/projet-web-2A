@@ -232,11 +232,23 @@ $users = $controller->afficherUsers();
                 </div>
             </div>
         </nav>
+
+
+        <!-- Recherche par email (centrée) -->
+      <div class="row mt-4 justify-content-center">
+        <div class="col-md-6">
+          <input type="text" id="searchEmail" class="form-control text-center" placeholder="Rechercher par email">
+        </div>
+      </div>
+
+      <!-- Bouton pour trier le tableau par nom -->
+<button id="sortNomBtn" class="btn btn-primary mb-3">Trier par Nom ↑↓</button>
+
         <!-- End Navbar -->
         <div class="container-fluid py-2">
             <div class="row">
                 <div class="ms-3">
-                    <h3 class="mb-0 h4 font-weight-bolder">Dashboard</h3>
+                    <h3 class="mb-0 h4 font-weight-bolder"></h3>
                     
                 </div>
                 <div class="container mt-5">
@@ -255,7 +267,7 @@ $users = $controller->afficherUsers();
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="userTableBody">
         <?php if (!empty($users)): ?>
           <?php foreach ($users as $user): ?>
             <tr>
@@ -293,6 +305,56 @@ $users = $controller->afficherUsers();
             <td colspan="8" class="text-center">Aucun utilisateur trouvé.</td>
           </tr>
         <?php endif; ?>
+            <script>
+      document.getElementById("searchEmail").addEventListener("input", function () {
+        const emailSearchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#userTableBody tr");
+        let noResults = true;  // Variable pour suivre si des résultats existent
+
+        rows.forEach(row => {
+          // Ignore la ligne "Aucun résultat trouvé"
+          if (row.id === "noResults") return;
+
+          const email = row.children[2].textContent.toLowerCase(); // 3e colonne = Email
+          const matchesEmail = !emailSearchTerm || email.includes(emailSearchTerm);
+
+          // Afficher ou masquer la ligne selon la recherche
+          if (matchesEmail) {
+            row.style.display = "";
+            noResults = false;
+          } else {
+            row.style.display = "none";
+          }
+        });
+
+        // Affiche ou masque la ligne "Aucun résultat trouvé"
+        document.getElementById("noResults").style.display = noResults ? "" : "none";
+      });
+    </script>
+  <script>
+  let triNomAsc = true;
+
+  document.getElementById("sortNomBtn").addEventListener("click", function () {
+    const tbody = document.getElementById("userTableBody");
+    const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.id !== "noResults");
+
+    rows.sort((a, b) => {
+      const nomA = a.children[0].textContent.trim().toLowerCase(); // Colonne "Nom"
+      const nomB = b.children[0].textContent.trim().toLowerCase();
+
+      if (nomA < nomB) return triNomAsc ? -1 : 1;
+      if (nomA > nomB) return triNomAsc ? 1 : -1;
+      return 0;
+    });
+
+    // Vide le tableau et réinsère les lignes triées
+    rows.forEach(row => tbody.appendChild(row));
+
+    triNomAsc = !triNomAsc; // Inverse l'ordre du tri pour le clic suivant
+  });
+</script>
+
+
       </tbody>
     </table>
   </div>

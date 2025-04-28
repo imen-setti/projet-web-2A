@@ -79,47 +79,72 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3">
-            <input type="text" id="nom" name="nom" class="form-control" placeholder="Nom">
-            <span class="error" id="errorNom"></span>
+          <div id="security-test-container" class="mb-3">
+            <h5 class="mb-3">ARE YOU A ROBOT?</h5>
+            <div class="attempts-counter mb-2">
+                Tentatives restantes : <span id="attempts-left">3</span>
+            </div>
+            <div class="mb-3">
+                <label for="security-code" class="form-label">Entrez le code de sécurité: <span class="text-primary" id="current-code">xvhd5</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="security-code" placeholder="Entrez le code">
+                    <button class="btn btn-outline-secondary" type="button" onclick="generateNewCode()">
+                        <i class="fas fa-sync-alt"></i> Nouveau code
+                    </button>
+                </div>
+                <small class="text-muted">Le code est sensible à la casse (majuscules/minuscules)</small>
+            </div>
+            <div class="mt-3">
+                <button type="button" class="btn btn-primary" onclick="verifySecurityCode()" id="verify-btn">Vérifier</button>
+            </div>
+            <span class="error" id="errorSecurity"></span>
           </div>
-          <div class="mb-3">
-            <input type="text" id="prenom" name="prenom" class="form-control" placeholder="Prénom">
-            <span class="error" id="errorPrenom"></span>
-          </div>
-          <div class="mb-3">
-            <input type="email" id="email" name="email" class="form-control" placeholder="Email">
-            <span class="error" id="errorEmail"></span>
-          </div>
-          <div class="mb-3">
-            <input type="password" id="password" name="password" class="form-control" placeholder="Mot de passe">
-            <span class="error" id="errorPassword"></span>
-          </div>
-          <div class="mb-3">
-            <input type="text" id="numtel" name="numtel" class="form-control" placeholder="Téléphone (+XXX XXXXXXXX)">
-            <span class="error" id="errorNumtel"></span>
-          </div>
-          <div class="mb-3">
-            <select id="sexe" name="sexe" class="form-select">
-              <option value="">Sélectionnez le sexe</option>
-              <option value="Homme">Homme</option>
-              <option value="Femme">Femme</option>
-            </select>
-            <span class="error" id="errorSexe"></span>
-          </div>
-          <div class="mb-3">
-            <select id="role" name="role" class="form-select">
-              <option value="">Sélectionnez le rôle</option>
-              <option value="admin">Admin</option>
-              <option value="enseignant">Client</option>
-              <option value="etudiant">Organisateur</option>
-            </select>
-            <span class="error" id="errorRole"></span>
-          </div>
+          <div id="registration-form" style="display: none;">
+            <div class="mb-3">
+              <input type="text" id="nom" name="nom" class="form-control" placeholder="Nom">
+              <span class="error" id="errorNom"></span>
+            </div>
+            <div class="mb-3">
+              <input type="text" id="prenom" name="prenom" class="form-control" placeholder="Prénom">
+              <span class="error" id="errorPrenom"></span>
+            </div>
+            <div class="mb-3">
+              <input type="email" id="email" name="email" class="form-control" placeholder="Email">
+              <span class="error" id="errorEmail"></span>
+            </div>
+            <div class="mb-3">
+              <input type="password" id="password" name="password" class="form-control" placeholder="Mot de passe">
+              <span class="error" id="errorPassword"></span>
+            </div>
+            <div class="mb-3">
+              <input type="text" id="numtel" name="numtel" class="form-control" placeholder="Téléphone (+XXX XXXXXXXX)">
+              <span class="error" id="errorNumtel"></span>
+            </div>
+            <div class="mb-3">
+              <select id="sexe" name="sexe" class="form-select">
+                <option value="">Sélectionnez le sexe</option>
+                <option value="Homme">Homme</option>
+                <option value="Femme">Femme</option>
+              </select>
+              <span class="error" id="errorSexe"></span>
+            </div>
+            <div class="mb-3">
+              <select id="role" name="role" class="form-select">
+                <option value="">Sélectionnez le rôle</option>
+                <option value="admin">Admin</option>
+                <option value="enseignant">Client</option>
+                <option value="etudiant">Organisateur</option>
+              </select>
+              <span class="error" id="errorRole"></span>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" name="submit" class="btn btn-primary">S'inscrire</button>
+              <div class="mt-3">
+            <a href="login.php">Se Connecter</a>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" name="submit" class="btn btn-primary">S'inscrire</button>
+            </div>
+          </div>
         </div>
       </form>
     </div>
@@ -230,6 +255,91 @@
   });
 </script>
 
+<!-- Script pour le test de direction -->
+<script>
+    let attemptsLeft = 3;
+    let currentCode = generateRandomCode();
+
+    function generateRandomCode() {
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let newCode = '';
+        for (let i = 0; i < 5; i++) {
+            newCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return newCode;
+    }
+
+    function generateNewCode() {
+        currentCode = generateRandomCode();
+        document.getElementById('current-code').textContent = currentCode;
+        document.getElementById('security-code').value = '';
+        document.getElementById('errorSecurity').textContent = '';
+    }
+
+    function updateAttemptsCounter() {
+        document.getElementById('attempts-left').textContent = attemptsLeft;
+    }
+
+    function verifySecurityCode() {
+        if (attemptsLeft <= 0) {
+            document.getElementById('errorSecurity').textContent = "Nombre maximum de tentatives atteint.";
+            return;
+        }
+
+        const enteredCode = document.getElementById('security-code').value.trim();
+        
+        if (!enteredCode) {
+            document.getElementById('errorSecurity').textContent = "Veuillez entrer le code.";
+            return;
+        }
+
+        if (enteredCode === currentCode) {
+            document.getElementById('errorSecurity').textContent = "";
+            document.getElementById('security-test-container').style.display = 'none';
+            document.getElementById('registration-form').style.display = 'block';
+            return;
+        } else {
+            attemptsLeft--;
+            updateAttemptsCounter();
+            
+            if (attemptsLeft <= 0) {
+                document.getElementById('errorSecurity').textContent = "Nombre maximum de tentatives atteint.";
+                document.getElementById('verify-btn').disabled = true;
+            } else {
+                document.getElementById('errorSecurity').textContent = `Code incorrect. Il vous reste ${attemptsLeft} tentative(s).`;
+                document.getElementById('security-code').value = '';
+                generateNewCode();
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateAttemptsCounter();
+        document.getElementById('current-code').textContent = currentCode;
+    });
+</script>
+
+<style>
+    .attempts-counter {
+        font-weight: bold;
+        color: #dc3545;
+    }
+    .text-primary {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    .input-group {
+        margin-bottom: 0.5rem;
+    }
+    .progress {
+        margin-top: 0.5rem;
+    }
+    #security-code {
+        font-family: monospace;
+        letter-spacing: 2px;
+    }
+</style>
+
 </body>
 </html>
 
@@ -262,5 +372,7 @@ if (isset($_POST['submit'])) {
     exit(); // Arrête l'exécution du script
 }
 ?>
+
+
 
 

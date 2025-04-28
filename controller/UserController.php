@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config/connexion.php';
 require_once __DIR__ . '/../model/User.php';
 
+
 class UserController {
 
     
@@ -141,5 +142,39 @@ class UserController {
             exit;
         }
     }
+    public function login() {
+        // Traiter la connexion si le formulaire est soumis
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+
+            // Connexion à la base de données
+            $db = config::getConnexion();
+            $sql = "SELECT * FROM user WHERE email = :email";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(['email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                // Vérification du mot de passe
+                if ($user['password'] === $password) {
+                    // Connexion réussie
+                    $_SESSION['user_id'] = $user['iduser'];  // Sauvegarde l'ID utilisateur dans la session
+                    $_SESSION['user_email'] = $user['email'];  // Sauvegarde l'email dans la session
+                    $_SESSION['message'] = 'Connexion réussie !';
+                    header('Location: index.php');  // Redirige vers la page d'accueil
+                    exit;
+                } else {
+                    // Mot de passe incorrect
+                    $_SESSION['message'] = 'Mot de passe incorrect.';
+                }
+            } else {
+                // Email non trouvé
+                $_SESSION['message'] = 'Email non trouvé.';
+            }
+        }
+    }
+    
 }
+
 ?>
