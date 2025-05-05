@@ -8,8 +8,20 @@ require_once('C:\xampp\htdocs\nada\controller\paiementC.php');
 // Create an instance of UserC class
 $paiement = new paiementC();
 
-// Fetch the list of users
-$tab = $paiement->listPaiements();
+// Vérifier si une recherche a été soumise
+$tab = [];
+if (isset($_POST['search']) && !empty($_POST['search_carte'])) {
+    $tab = $paiement->searchPaiementByCarte($_POST['search_carte']);
+} 
+// Vérifier si un tri par montant est demandé
+elseif (isset($_GET['sort_montant'])) {
+    $order = $_GET['sort_montant'] === 'asc' ? 'ASC' : 'DESC';
+    $tab = $paiement->getPaiementsByMontant($order);
+}
+else {
+    // Fetch the list of users
+    $tab = $paiement->listPaiements();
+}
 ?>
 
 <!--
@@ -91,10 +103,25 @@ $tab = $paiement->listPaiements();
           <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
-                <h6 class="text-white text-capitalize ps-3">Paiements </h6>
+              <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center px-3">
+  <h6 class="text-white text-capitalize m-0">Paiements</h6>
+  <a href="mailing.php" class="btn btn-sm btn-light text-dark">
+    + Envoyer des mail du comfiramtion
+  </a>
+</div>
               </div>
             </div>
             <div class="card-body px-0 pb-2">
+              <!-- Formulaire de recherche -->
+              <div class="px-4 mb-3">
+                <form method="POST" action="" class="d-flex align-items-center">
+                  <div class="input-group input-group-outline me-2">
+                    <label class="form-label">Recherche par carte</label>
+                    <input type="text" name="search_carte" class="form-control">
+                  </div>
+                  <button type="submit" name="search" class="btn btn-sm bg-gradient-dark">Rechercher</button>
+                </form>
+              </div>
               <div class="table-responsive p-0">
                 <table class="table align-items-center mb-0">
                   <thead>
@@ -104,12 +131,23 @@ $tab = $paiement->listPaiements();
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Methode du paiement</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Devise</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Numero de carte </th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Montant</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                        Montant
+                        <div class="d-flex mt-1">
+                          <a href="?sort_montant=asc" class="btn btn-xs btn-outline-dark me-1" title="Trier croissant">
+                            <i class="fas fa-sort-amount-up-alt"></i>
+                          </a>
+                          <a href="?sort_montant=desc" class="btn btn-xs btn-outline-dark" title="Trier décroissant">
+                            <i class="fas fa-sort-amount-down"></i>
+                          </a>
+                        </div>
+                      </th>
 
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description </th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Afficher </th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Modifier  </th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Supprimer </th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Facture</th>
                       <th class="text-secondary opacity-7"></th>
                     </tr>
                   </thead>
@@ -154,6 +192,9 @@ $tab = $paiement->listPaiements();
 
                         </span>
                       </td>
+                      <td class="align-middle text-center">
+                         <a class="btn btn-sm btn-outline-dark" href="facture_list.php?paiement_id=<?= $paiement['id']; ?>">Facture</a>
+                     </td>
                     </tr>
         
              

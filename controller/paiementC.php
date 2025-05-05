@@ -96,5 +96,28 @@ class PaiementC
 
         return $query->execute();
     }
+    public function searchPaiementByCarte($carte) {
+        $sql = "SELECT * FROM paiement WHERE carte LIKE :carte";
+        $db = config::getConnexion();
+        try {
+            $query = $db->prepare($sql);
+            $query->execute(['carte' => "%$carte%"]);
+            return $query->fetchAll();
+        } catch (Exception $e) {
+            die('Erreur: ' . $e->getMessage());
+        }
+    }
+    
+    public function getPaiementsByMontant($order = "ASC") {
+        $sql = "SELECT * FROM paiement ORDER BY montant " . $order;
+        $db = config::getConnexion();
+        try {
+            $liste = $db->query($sql);
+            return $liste;
+        } catch (Exception $e) {
+            die('Erreur : ' . $e->getMessage());
+        }
+    }
+    
 }
 ?>
